@@ -1,11 +1,36 @@
-FROM alpine:3.17
-RUN apk update && apk upgrade && apk add --no-cache \
-    php \
-    php-fpm \
-    php-mysqli \
-    php-phar \
+FROM debian:bullseye
+
+# Install required packages for adding repositories and curl
+RUN apt update && apt install -y \
+    gnupg2 \
+    curl \
+    lsb-release \
+    software-properties-common
+
+# Add PHP repository and update package list
+RUN curl -fsSL https://packages.sury.org/php/apt.gpg | apt-key add - && \
+    echo "deb https://packages.sury.org/php/ $(lsb_release -cs) main" > /etc/apt/sources.list.d/php.list && \
+    apt update
+
+# Install PHP, PHP-FPM, MariaDB client, and other required packages
+RUN apt install -y \
+    php8.1 \
+    php8.1-fpm \
+    php8.1-mysqli \
+    php8.1-mysql \
     mariadb-client \
-    curl
+    curl && \
+    apt clean && rm -rf /var/lib/apt/lists/*
+
+# Copy the WordPress setup script
 COPY tools/wordpress.sh /usr/local/bin/wordpress.sh
+
+# Make the script executable
 RUN chmod +x /usr/local/bin/wordpress.sh
+
+# Install wp-cli in the Docker image
+RUN curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+    chmod +x /usr/local/bin/wp
+
+# Command to run the WordPress setup script
 CMD ["sh", "/usr/local/bin/wordpress.sh"]

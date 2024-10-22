@@ -10,8 +10,9 @@ curl -o wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/pha
 chmod +x wp-cli.phar
 mv wp-cli.phar /usr/local/bin/wp
 
-# Adjust PHP-FPM configuration for Alpine
-sed -i 's|^listen =.*|listen = 9000|' /etc/php81/php-fpm.d/www.conf
+# Adjust PHP-FPM configuration for Debian
+# Note: The PHP version might vary, change 'php' to 'php8.1' or your installed version if needed
+sed -i 's|^listen =.*|listen = wordpress:9000|' /etc/php/8.1/fpm/pool.d/www.conf
 
 # Create necessary directories
 mkdir -p /run/php
@@ -41,5 +42,5 @@ wp core install --allow-root --url="${DOMAIN_NAME}" --title="inception" \
 wp user create "$WP_USER" "$WP_USER_EMAIL" --role=author --user_pass="$WP_USER_PASSWORD" \
     --allow-root --path=/var/www/html
 
-# Start PHP-FPM service (use the correct path for Alpine Linux)
-php-fpm81 -F
+# Start PHP-FPM service (adjust PHP version if necessary)
+php-fpm8.1 -F

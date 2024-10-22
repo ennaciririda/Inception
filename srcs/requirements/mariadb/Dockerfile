@@ -1,17 +1,22 @@
-FROM alpine:3.17
+FROM debian:bullseye
 
-# Update and install MariaDB and client
-RUN apk update && apk upgrade && apk add mariadb mariadb-client openrc
+# Update package list and install MariaDB server and client
+RUN apt update && apt upgrade -y && \
+    apt install -y mariadb-server mariadb-client
 
-# Copy configuration and script
+# Copy configuration file and setup script
 COPY ./conf/mariadb.conf /etc/mysql/
 COPY ./tools/databaseconf.sh /
 
-# Make the script executable
+# Make the setup script executable
 RUN chmod +x /databaseconf.sh
 
-# Set data directory permissions
-RUN mkdir -p /var/lib/mysql && chown -R mysql:mysql /var/lib/mysql
+# Ensure correct ownership for MySQL directories
+RUN mkdir -p /var/lib/mysql /run/mysqld && \
+    chown -R mysql:mysql /var/lib/mysql /run/mysqld
 
-# Start MariaDB
-CMD ["sh", "./databaseconf.sh"]
+# Expose MySQL port
+EXPOSE 3306
+
+# Start MariaDB using the setup script
+CMD ["/bin/bash", "/databaseconf.sh"]
