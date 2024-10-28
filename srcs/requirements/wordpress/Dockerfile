@@ -1,15 +1,16 @@
+# Use Debian Bullseye as the base image
 FROM debian:bullseye
 
 # Install required packages for adding repositories and curl
 RUN apt update && apt install -y \
-    gnupg2 \
+    gnupg \
     curl \
     lsb-release \
     software-properties-common
 
 # Add PHP repository and update package list
-RUN curl -fsSL https://packages.sury.org/php/apt.gpg | apt-key add - && \
-    echo "deb https://packages.sury.org/php/ $(lsb_release -cs) main" > /etc/apt/sources.list.d/php.list && \
+RUN curl -fsSL https://packages.sury.org/php/apt.gpg -o /usr/share/keyrings/php-archive-keyring.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/php-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -cs) main" > /etc/apt/sources.list.d/php.list && \
     apt update
 
 # Install PHP, PHP-FPM, MariaDB client, and other required packages
@@ -17,10 +18,7 @@ RUN apt install -y \
     php8.1 \
     php8.1-fpm \
     php8.1-mysqli \
-    php8.1-mysql \
-    mariadb-client \
-    curl && \
-    apt clean && rm -rf /var/lib/apt/lists/*
+    php8.1-mysql mariadb-client
 
 # Copy the WordPress setup script
 COPY tools/wordpress.sh /usr/local/bin/wordpress.sh

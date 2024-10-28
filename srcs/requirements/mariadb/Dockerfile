@@ -2,10 +2,10 @@ FROM debian:bullseye
 
 # Update package list and install MariaDB server and client
 RUN apt update && apt upgrade -y && \
-    apt install -y mariadb-server mariadb-client
-
+    apt install -y mariadb-server
 # Copy configuration file and setup script
-COPY ./conf/mariadb.conf /etc/mysql/
+COPY conf/50-server.cnf	/etc/mysql/mariadb.conf.d/50-server.cnf
+
 COPY ./tools/databaseconf.sh /
 
 # Make the setup script executable

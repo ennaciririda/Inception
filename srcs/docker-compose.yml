@@ -44,12 +44,12 @@ volumes:
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '/home/reda/data/wordpress'
+      device: '/home/rennacir/data/wordpress'
   mariadb:
     driver: local
     driver_opts:
       type: none
-      device: /home/reda/data/mariadb
+      device: /home/rennacir/data/mariadb
       o: bind
 
 networks:
