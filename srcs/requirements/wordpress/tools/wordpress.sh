@@ -3,15 +3,7 @@
 # Wait for MariaDB to be ready
 sleep 20
 
-# Download wp-cli.phar
-curl -o wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 
-# Make it executable and move to a directory in the PATH
-chmod +x wp-cli.phar
-mv wp-cli.phar /usr/local/bin/wp
-
-# Adjust PHP-FPM configuration for Debian
-# Note: The PHP version might vary, change 'php' to 'php8.1' or your installed version if needed
 sed -i 's|^listen =.*|listen = wordpress:9000|' /etc/php/8.1/fpm/pool.d/www.conf
 
 # Create necessary directories

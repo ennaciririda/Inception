@@ -1,0 +1,93 @@
+events {} : 
+		- Purpose: Configures general connection-handling settings
+		- Default settings :
+			* worker_connections
+				Default: 1024
+				This is the maximum number of simultaneous connections a single worker process can handle.
+				Example: If there are 4 worker processes, the server can handle up to 4 × 1024 = 4096 connections.
+				Includes: Each client connection and internal connections (e.g., proxied connections).
+			* use
+				Default: Automatically chosen based on the operating system.
+				Possible Values:
+					epoll (Linux): Efficient, scalable event mechanism for high-performance web servers.
+					kqueue (BSD/macOS): Similar to epoll but designed for BSD-based systems.
+					select or poll: Legacy mechanisms, less efficient but supported on older systems.
+				Behavior: Nginx detects the best event mechanism supported by the OS and uses it.
+			* multi_accept
+				Default: off
+				When enabled, a worker process accepts all incoming connections at once rather than one by one.
+				Behavior: Suitable for high-load scenarios but not enabled by default to balance load more evenly.
+			* accept_mutex
+				Default: on
+				Prevents multiple worker processes from trying to accept connections simultaneously, which avoids contention.
+				Behavior:
+				Improves performance under load by serializing connection acceptance.
+			* accept_mutex_delay
+				Default: 500ms
+				The delay between attempts for worker processes to acquire the accept_mutex.
+				Purpose: Helps evenly distribute connection handling among workers.
+		- Why Leave It Empty?
+			Leaving the events block empty lets Nginx operate with its optimized defaults. These defaults are designed to:
+				* Support typical workloads without manual tuning.
+				* Automatically adapt to the operating system for efficient performance.
+http {} :
+		- The http block is the core of Nginx's configuration for handling HTTP and HTTPS traffic.
+		- Purpose: Defines settings related to web traffic, including servers, security, and routing.
+server {} :
+		- Defines a virtual server that listens for and processes client requests.
+		- What is a Virtual Server?
+			- A virtual server is a logical instance within the Nginx configuration that processes requests.
+			- It operates independently, meaning multiple server blocks can coexist, each handling different requests.
+			- Nginx uses virtual servers to support multiple websites or applications on a single machine (or IP address).
+listen 443 ssl; :
+		- listen: Instructs Nginx to listen for incoming requests on port 443, which is the standard port for HTTPS.
+		- ssl: Specifies that SSL/TLS encryption should be used for this connection.
+		- If omitted, this line would listen for unencrypted traffic, which is unsuitable for HTTPS.
+ssl_protocols TLSv1.2 TLSv1.3; :
+		- Defines the SSL/TLS protocols the server supports for secure connections.
+		- TLSv1.2 and TLSv1.3: Modern, secure protocols for encrypted communication.
+		- TLSv1.3 is the most recent version with improved performance and security.
+		- TLSv1.2 is widely supported for compatibility with older clients.
+		- Nginx disables older protocols like TLSv1.0/1.1 for security reasons.
+ssl_certificate /etc/nginx/ssl/inception.crt; :
+		- Specifies the path to the SSL certificate file (inception.crt), which contains the public key and proof of authenticity.
+		- This file is used during the SSL/TLS handshake to verify the server's identity.
+ssl_certificate_key /etc/nginx/ssl/inception.key; :
+		- Specifies the path to the private key file (inception.key) that corresponds to the certificate.
+		- During the SSL/TLS handshake, the private key is used to:
+			* Prove ownership of the certificate.
+			* Securely establish encryption with the client.
+root /var/www/html; :
+		- Defines the document root directory where the server looks for static files to serve (e.g., HTML, CSS, JS).
+		- /var/www/html: A common directory for web content in Linux systems.
+server_name rennacir.42.fr; :
+		- Specifies the domain name(s) this server block will handle.
+		- rennacir.42.fr: Only requests targeting this domain will be processed by this server block.
+		- Nginx can match multiple names or wildcards (e.g., *.rennacir.42.fr).
+index index.php; :
+		- Defines the default file to serve when the root directory (/) is requested.
+		- index.php: Indicates this server is set up for PHP-based applications (e.g., WordPress).
+location / {}
+		- Defines a location block that matches the root path (/).
+		- Handles all requests targeting the base URL or paths without specific patterns.
+		- Details of the location / Block:
+			try_files $uri $uri/ =404;
+			* try_files: Instructs Nginx to look for specific files or directories and handle the request accordingly:
+			* $uri: Tries to find a file matching the requested URI.
+			* $uri/: If not found, checks for a directory with the requested URI.
+			* =404: If neither exists, returns a 404 Not Found error.
+location ~ \.php$ {}
+		- Defines a location block that matches requests ending with .php (e.g., example.php).
+		- ~: Indicates a regular expression match.
+		- \.php$:
+			* \.: Escapes the dot (.), treating it literally.
+			* php$: Matches .php at the end of the URL.
+		- Details of the location ~ \.php$ Block:
+			* include snippets/fastcgi-php.conf;
+				. Includes a configuration snippet for processing PHP requests.
+				. This snippet typically handles passing PHP requests to a FastCGI server (e.g., php-fpm).
+			* fastcgi_pass wordpress:9000;
+				. Forwards the PHP request to a FastCGI server running on host wordpress at port 9000.
+				. wordpress:
+					The hostname of the PHP application container (defined in Docker).
+				. 9000: Default port for php-fpm.
