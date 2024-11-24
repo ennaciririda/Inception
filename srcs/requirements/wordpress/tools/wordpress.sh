@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# Wait for MariaDB to be ready
-sleep 20
+until nc -z -v mariadb 3306; do
+  echo "Waiting for MariaDB to be ready..."
+  sleep 2
+done
 
 
 sed -i 's|^listen =.*|listen = wordpress:9000|' /etc/php/8.1/fpm/pool.d/www.conf

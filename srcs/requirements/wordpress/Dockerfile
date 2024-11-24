@@ -18,7 +18,8 @@ RUN apt install -y \
     php8.1 \
     php8.1-fpm \
     php8.1-mysqli \
-    php8.1-mysql mariadb-client
+    php8.1-mysql mariadb-client \
+    netcat
 
 # Copy the WordPress setup script
 COPY tools/wordpress.sh /usr/local/bin/wordpress.sh
