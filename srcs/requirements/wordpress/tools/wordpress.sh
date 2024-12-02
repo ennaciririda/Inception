@@ -1,6 +1,6 @@
 #!/bin/bash
 
-until nc -z -v mariadb 3306; do
+until nc -z mariadb 3306; do
   echo "Waiting for MariaDB to be ready..."
   sleep 2
 done

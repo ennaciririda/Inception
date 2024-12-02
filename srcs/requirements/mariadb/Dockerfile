@@ -2,7 +2,7 @@ FROM debian:bullseye
 
 # Update package list and install MariaDB server and client
 RUN apt update && apt upgrade -y && \
-    apt install -y mariadb-server
+    apt install -y mariadb-server netcat
 # Copy configuration file and setup script
 COPY conf/50-server.cnf	/etc/mysql/mariadb.conf.d/50-server.cnf
 

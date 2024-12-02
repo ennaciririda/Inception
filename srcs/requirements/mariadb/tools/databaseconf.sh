@@ -1,17 +1,18 @@
 #!/bin/bash
 
-service mariadb start
+mysqld_safe &
 
-sleep 10
+until mysqladmin ping --silent; do
+    echo "Waiting for MariaDB to be ready..."
+    sleep 2
+done
 
-mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$DB_ROOT_PWD';"
-mysql -u root -p"$DB_ROOT_PWD" -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
-mysql -u root -p"$DB_ROOT_PWD" -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';"
-mysql -u root -p"$DB_ROOT_PWD" -e "GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';"
-mysql -u root -p"$DB_ROOT_PWD" -e "FLUSH PRIVILEGES;"
+# mysql -e "ALTER USER 'root'@'%' IDENTIFIED BY '$DB_ROOT_PWD';"
+mysql -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
+mysql -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';"
+mysql -e "GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';"
+mysql -e "FLUSH PRIVILEGES;"
 
-# echo "MySQL root password: $DB_ROOT_PWD"
-
-mysqladmin -u root -p"$DB_ROOT_PWD" shutdown
+mysqladmin shutdown
 echo "Database configuration completed."
-exec mysqld_safe
+mysqld_safe
