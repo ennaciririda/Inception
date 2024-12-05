@@ -14,6 +14,4 @@ RUN mkdir -p /var/run/nginx
 # Copy the nginx configuration file
 COPY conf/nginx.conf /etc/nginx/nginx.conf
 
-# Expose port 80
-EXPOSE 443
 CMD ["nginx", "-g", "daemon off;"]

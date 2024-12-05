@@ -15,8 +15,5 @@ RUN chmod +x /databaseconf.sh
 RUN mkdir -p /var/lib/mysql /run/mysqld && \
     chown -R mysql:mysql /var/lib/mysql /run/mysqld
 
-# Expose MySQL port
-EXPOSE 3306
-
 # Start MariaDB using the setup script
 CMD ["/bin/bash", "/databaseconf.sh"]

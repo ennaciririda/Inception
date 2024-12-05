@@ -15,10 +15,10 @@ RUN curl -fsSL https://packages.sury.org/php/apt.gpg -o /usr/share/keyrings/php-
 
 # Install PHP, PHP-FPM, MariaDB client, and other required packages
 RUN apt install -y \
-    php8.1 \
-    php8.1-fpm \
-    php8.1-mysqli \
-    php8.1-mysql mariadb-client \
+    php7.4 \
+    php7.4-fpm \
+    php7.4-mysql \
+    mariadb-client \
     netcat
 
 # Copy the WordPress setup script
