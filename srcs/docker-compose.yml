@@ -12,7 +12,8 @@ services:
       - wordpress:/var/www/html
     restart: always
     ports:
-      - "443:443"
+      - "8443:443"
+      - "8080:8080"
 
   mariadb:
     image: mariadb:reda
@@ -38,6 +39,19 @@ services:
       - wordpress:/var/www/html
     restart: always
 
+  phpmyadmin:
+    depends_on:
+      - mariadb
+    image: phpmyadmin:reda
+    container_name: phpmyadmin
+    networks:
+      - inception
+    build: ./requirements/phpmyadmin
+    env_file: .env
+    volumes:
+      - phpmyadmin:/var/www/html
+    restart: always
+
 volumes:
   wordpress:
     driver: local
@@ -51,9 +65,13 @@ volumes:
       type: none
       o: bind
       device: /home/rennacir/data/mariadb
+  phpmyadmin:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/rennacir/data/phpmyadmin
 
 networks:
   inception:
     driver: bridge
-
-  
